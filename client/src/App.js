@@ -9,7 +9,9 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    let url = 'http://localhost:5000/api/news';
+
+    // ✅ Dynamic backend URL from .env
+    let url = `${process.env.REACT_APP_API_URL}/api/news`;
     if (selectedSource !== 'All') {
       url += `?source=${encodeURIComponent(selectedSource)}`;
     }
@@ -43,33 +45,19 @@ function App() {
           >
             {darkMode ? (
               // Sun icon
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-yellow-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.8}
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M12 4V2m0 20v-2m10-8h-2M4 12H2
-                   m15.536 6.364l1.414 1.414M6.05 6.05L4.636 4.636
-                   M18.364 5.636l-1.414 1.414M5.636 18.364l1.414-1.414
-                   M12 6a6 6 0 100 12 6 6 0 000-12z"
+                     m15.536 6.364l1.414 1.414M6.05 6.05L4.636 4.636
+                     M18.364 5.636l-1.414 1.414M5.636 18.364l1.414-1.414
+                     M12 6a6 6 0 100 12 6 6 0 000-12z"
                 />
               </svg>
             ) : (
               // Moon icon
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-gray-800 dark:text-gray-100"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.8}
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800 dark:text-gray-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -4,9 +4,15 @@ const Parser = require('rss-parser');
 
 const app = express();
 const parser = new Parser();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// ✅ CORS for frontend on Vercel
+app.use(cors({ origin: 'https://fresh-press-orpin.vercel.app' }));
+
+// ✅ Optional root route
+app.get('/', (req, res) => {
+  res.send('✅ FreshPress backend is live!');
+});
 
 const sources = [
   {
@@ -28,17 +34,15 @@ const sources = [
 ];
 
 app.get('/api/news', async (req, res) => {
-  const selectedSource = req.query.source; // Get the source from frontend query
+  const selectedSource = req.query.source;
   const results = [];
 
   try {
     for (const source of sources) {
-      // ✅ If a specific source is selected, skip others
       if (selectedSource && source.name !== selectedSource) continue;
 
       try {
         const feed = await parser.parseURL(source.url);
-
         feed.items.slice(0, 5).forEach((item) => {
           results.push({
             title: item.title,
@@ -59,7 +63,6 @@ app.get('/api/news', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch news' });
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`✅ FreshPress backend running at http://localhost:${PORT}`);
