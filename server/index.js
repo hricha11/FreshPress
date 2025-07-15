@@ -28,12 +28,17 @@ const sources = [
 ];
 
 app.get('/api/news', async (req, res) => {
-  try {
-    const results = [];
+  const selectedSource = req.query.source; // Get the source from frontend query
+  const results = [];
 
+  try {
     for (const source of sources) {
+      // ✅ If a specific source is selected, skip others
+      if (selectedSource && source.name !== selectedSource) continue;
+
       try {
         const feed = await parser.parseURL(source.url);
+
         feed.items.slice(0, 5).forEach((item) => {
           results.push({
             title: item.title,
@@ -54,6 +59,7 @@ app.get('/api/news', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch news' });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`✅ FreshPress backend running at http://localhost:${PORT}`);
