@@ -1,0 +1,28 @@
+# Node
+node_modules/
+npm-debug.log*
+.env
+
+# React build
+client/build/
+client/node_modules/
+client/.env
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# MacOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# VSCode settings (optional)
+.vscode/
+
+# Dependency lock files (optional, keep one)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
