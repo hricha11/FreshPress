@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import NewsCard from './components/NewsCard';
+import DailyDigestForm from './components/DailyDigestForm';
 
 function App() {
   const [news, setNews] = useState([]);
@@ -38,6 +39,9 @@ function App() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-bold text-blue-700 dark:text-blue-300">📰 FreshPress</h1>
+          <div className="flex items-center gap-3">
+    {/* Subscribe Button */}
+          <DailyDigestForm articles={news.slice(0, 5)} />
           <button
             onClick={toggleDarkMode}
             className="p-2 rounded-full transition hover:scale-110 hover:bg-gray-200 dark:hover:bg-yellow-500/20"
@@ -66,6 +70,7 @@ function App() {
               </svg>
             )}
           </button>
+          </div>
         </div>
 
         {/* Subheading */}
@@ -101,6 +106,7 @@ function App() {
           </div>
         )}
       </div>
+      
     </div>
   );
 }

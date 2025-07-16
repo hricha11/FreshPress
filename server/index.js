@@ -1,19 +1,29 @@
 const express = require('express');
 const cors = require('cors');
 const Parser = require('rss-parser');
+require('dotenv').config();
 
 const app = express();
 const parser = new Parser();
+const sendDigestEmail = require('./services/sendEmail');
+
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS for frontend on Vercel
-app.use(cors({ origin: 'https://fresh-press-orpin.vercel.app' }));
+// ✅ Enable CORS for your deployed frontend
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://fresh-press-orpin.vercel.app']
+}));
 
-// ✅ Optional root route
+
+// ✅ Middleware to parse JSON request bodies
+app.use(express.json());
+
+// ✅ Optional base route
 app.get('/', (req, res) => {
   res.send('✅ FreshPress backend is live!');
 });
 
+// ✅ News Sources
 const sources = [
   {
     name: 'The Hindu',
@@ -33,6 +43,7 @@ const sources = [
   },
 ];
 
+// ✅ GET /api/news
 app.get('/api/news', async (req, res) => {
   const selectedSource = req.query.source;
   const results = [];
@@ -64,6 +75,47 @@ app.get('/api/news', async (req, res) => {
   }
 });
 
+// ✅ POST /api/send-digest
+app.post('/api/send-digest', async (req, res) => {
+  const { email, articles } = req.body;
+
+  if (!email || !articles || !Array.isArray(articles)) {
+    return res.status(400).json({ error: 'Invalid request. Provide email and articles array.' });
+  }
+
+  // Build email content
+  const html = `
+    <div style="font-family: Arial, sans-serif;">
+      <h2 style="color: #007BFF;">📰 Your FreshPress Daily Digest</h2>
+      <p>Here are your top ${articles.length} headlines today:</p>
+      <ul>
+        ${articles
+          .map(
+            (article) => `
+          <li style="margin-bottom: 10px;">
+            <a href="${article.link}" style="color: #333; text-decoration: none; font-weight: bold;">
+              ${article.title}
+            </a>
+            <p style="margin: 4px 0 0; color: #555;">${article.summary}</p>
+          </li>`
+          )
+          .join('')}
+      </ul>
+      <p style="margin-top: 20px;">Stay informed!<br/>— The FreshPress Team</p>
+    </div>
+  `;
+
+  try {
+    await sendDigestEmail(email, '🗞️ Your FreshPress Daily Digest', html);
+    console.log('✅ Digest email sent to:', email);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Failed to send digest email:', err.message);
+    res.status(500).json({ error: 'Failed to send digest email' });
+  }
+});
+
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`✅ FreshPress backend running at http://localhost:${PORT}`);
 });
