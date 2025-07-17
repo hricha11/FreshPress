@@ -22,8 +22,8 @@ const NewsCard = ({ title, summary, link, source, pubDate, fullContent }) => {
   };
 
   return (
-    <div className="relative">
-      {/* Modern floating icon */}
+    <div className="relative h-full">
+      {/* Floating summarize icon */}
       <button
         className="absolute top-2 right-2 z-10 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full p-1.5 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
         title="Summarize this article"
@@ -32,15 +32,18 @@ const NewsCard = ({ title, summary, link, source, pubDate, fullContent }) => {
         <FaRegQuestionCircle className="text-blue-600 hover:text-blue-800" size={18} />
       </button>
 
-      {/* Content box with extra top-right padding */}
+      {/* Card box with equal height support */}
       <a
         href={link}
         target="_blank"
         rel="noopener noreferrer"
-        className="block p-4 pt-8 pr-8 bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition"
+        className="block h-full p-4 pt-8 pr-8 bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition"
       >
         <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-300">{title}</h2>
-        <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">{summary}</p>
+
+        {/* You asked to hide the summary/body, so this is removed */}
+        {/* <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">{summary}</p> */}
+
         <div className="mt-3 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
           <span>{source}</span>
           <span>{new Date(pubDate).toLocaleString()}</span>
