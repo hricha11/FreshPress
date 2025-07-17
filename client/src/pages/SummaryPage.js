@@ -1,13 +1,39 @@
-// client/src/pages/SummaryPage.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const SummaryPage = () => {
   const { state } = useLocation();
+  const [summary, setSummary] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  if (!state?.article) return <p>No article data found.</p>;
+  const article = state?.article;
 
-  const { title, content, source, pubDate, link } = state.article;
+  useEffect(() => {
+    if (!article?.content) return;
+
+    const fetchSummary = async () => {
+      try {
+        const response = await axios.post('http://localhost:5000/api/summarize', {
+          content: article.content,
+        });
+        setSummary(response.data.summary);
+      } catch (err) {
+        setSummary('Failed to generate summary.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, [article]);
+
+  if (!article) {
+    return <p>No article data found.</p>;
+  }
+
+  const { title, content, source, pubDate, link } = article;
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg shadow">
@@ -18,7 +44,12 @@ const SummaryPage = () => {
       <a href={link} className="text-blue-600 underline mb-4 block" target="_blank" rel="noreferrer">
         Read Original
       </a>
-      <p className="text-base leading-relaxed">{content}</p>
+
+      {loading ? (
+        <p className="italic">Generating summary...</p>
+      ) : (
+        <p className="text-base leading-relaxed whitespace-pre-wrap">{summary}</p>
+      )}
     </div>
   );
 };
