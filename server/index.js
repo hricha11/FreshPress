@@ -3,27 +3,25 @@ const cors = require('cors');
 const Parser = require('rss-parser');
 require('dotenv').config();
 
-const app = express();
-const parser = new Parser();
+const summarizeArticle = require('./services/summarizeArticle');
 const sendDigestEmail = require('./services/sendEmail');
 
+const app = express();
+const parser = new Parser();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Enable CORS for your deployed frontend
+// ✅ Middleware
 app.use(cors({
   origin: ['http://localhost:3000', 'https://fresh-press-orpin.vercel.app']
 }));
-
-
-// ✅ Middleware to parse JSON request bodies
 app.use(express.json());
 
-// ✅ Optional base route
+// ✅ Root check
 app.get('/', (req, res) => {
   res.send('✅ FreshPress backend is live!');
 });
 
-// ✅ News Sources
+// ✅ News sources
 const sources = [
   {
     name: 'The Hindu',
@@ -79,27 +77,23 @@ app.get('/api/news', async (req, res) => {
 app.post('/api/send-digest', async (req, res) => {
   const { email, articles } = req.body;
 
-  if (!email || !articles || !Array.isArray(articles)) {
+  if (!email || !Array.isArray(articles)) {
     return res.status(400).json({ error: 'Invalid request. Provide email and articles array.' });
   }
 
-  // Build email content
   const html = `
     <div style="font-family: Arial, sans-serif;">
       <h2 style="color: #007BFF;">📰 Your FreshPress Daily Digest</h2>
       <p>Here are your top ${articles.length} headlines today:</p>
       <ul>
-        ${articles
-          .map(
-            (article) => `
+        ${articles.map(article => `
           <li style="margin-bottom: 10px;">
             <a href="${article.link}" style="color: #333; text-decoration: none; font-weight: bold;">
               ${article.title}
             </a>
             <p style="margin: 4px 0 0; color: #555;">${article.summary}</p>
-          </li>`
-          )
-          .join('')}
+          </li>
+        `).join('')}
       </ul>
       <p style="margin-top: 20px;">Stay informed!<br/>— The FreshPress Team</p>
     </div>
@@ -112,6 +106,24 @@ app.post('/api/send-digest', async (req, res) => {
   } catch (err) {
     console.error('❌ Failed to send digest email:', err.message);
     res.status(500).json({ error: 'Failed to send digest email' });
+  }
+});
+
+// ✅ POST /api/summarize
+app.post('/api/summarize', async (req, res) => {
+  const { articleText } = req.body;
+
+  if (!articleText || typeof articleText !== 'string') {
+    return res.status(400).json({ error: 'Invalid or missing article text.' });
+  }
+
+  try {
+    console.log('🔍 Summarizing article...');
+    const summary = await summarizeArticle(articleText);
+    res.json({ summary });
+  } catch (err) {
+    console.error('❌ Summarization failed:', err.message);
+    res.status(500).json({ error: 'Failed to summarize article' });
   }
 });
 

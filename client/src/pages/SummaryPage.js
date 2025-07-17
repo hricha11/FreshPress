@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
+// ✅ Fix for Create React App
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+
 const SummaryPage = () => {
   const { state } = useLocation();
   const [summary, setSummary] = useState('');
@@ -14,7 +18,7 @@ const SummaryPage = () => {
 
     const fetchSummary = async () => {
       try {
-        const response = await axios.post('http://localhost:5000/api/summarize', {
+        const response = await axios.post(`${API_BASE_URL}/api/summarize`, {
           content: article.content,
         });
         setSummary(response.data.summary);
